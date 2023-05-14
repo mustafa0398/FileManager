@@ -89,24 +89,36 @@ public class FileManager {
     }
 
     private static void addFile(String fileName) {
+        if (fileName.matches(".*[/\\\\:*?\"<>|].*")) {
+            System.out.println("Invalid file name. File names cannot contain / \\ : * ? \" < > |");
+            return;
+        }
+
+        if ((ROOT_DIR.length() + fileName.length()) > 260) {
+            System.out.println("File name is too long. Total path length must be less than 260 characters.");
+            return;
+        }
+
+        File file = new File(ROOT_DIR, fileName);
         try {
-            File file = new File(ROOT_DIR, fileName);
-            boolean isCreated = file.createNewFile();
-            if (isCreated) {
+            if (file.createNewFile()) {
                 System.out.println("File created successfully.");
             } else {
                 System.out.println("File already exists.");
             }
         } catch (IOException e) {
-            System.out.println("An error occurred.");
-            e.printStackTrace();
+            System.out.println("An error occurred while trying to create the file. Please try again.");
         }
     }
     
     private static void deleteFile(String fileName) {
         File file = new File(ROOT_DIR, fileName);
-        if (file.delete()) {
-            System.out.println("File deleted successfully.");
+        if (file.exists() && file.isFile()) {
+            if (file.delete()) {
+                System.out.println("File deleted successfully.");
+            } else {
+                System.out.println("An error occurred while trying to delete the file.");
+            }
         } else {
             System.out.println("FNF (File Not Found). Please enter a valid file name.");
         }
@@ -114,7 +126,7 @@ public class FileManager {
 
     private static void searchFile(String fileName) {
         File file = new File(ROOT_DIR, fileName);
-        if (file.exists()) {
+        if (file.exists() && file.isFile()) {
             System.out.println("File found: " + file.getName());
         } else {
             System.out.println("FNF (File Not Found). Please enter a valid file name.");
